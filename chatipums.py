@@ -31,6 +31,7 @@ sample_table['detail'] = sample_table.apply(lambda row: row['Description'].split
 sample_table = sample_table.rename(columns={'Sample ID':'sample_id','Description':'description'})
 
 meta_df = pd.read_feather('/content/chatipums/ipums_usa_variable_metadata.feather')
+preselected_fields = ['SAMPLE', 'SERIAL', 'HHWT', 'GQ', 'PERNUM', 'PERWT', 'VERSIONHIST', 'HISTID']
 
 def select_sample(df):
     # 1. Ask the user for the year
@@ -199,8 +200,6 @@ def retrieve_extract():
     return None
 
 def load_extract():
-
-    preselected_fields = ['SAMPLE', 'SERIAL', 'HHWT', 'GQ', 'PERNUM', 'PERWT', 'VERSIONHIST', 'HISTID']
 
     extract_id = input('What is the extract id: ')
 
