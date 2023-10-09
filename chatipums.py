@@ -60,7 +60,7 @@ def download_extract(extract):
     print(f'The extract has been downloaded. You may find it at {DOWNLOAD_DIR}.')
 
 def ask_wait_extract(extract):
-    wait_decision = input('Would you like to wait for the extract to complete and \ndownload automatically when it is ready? [y/n]')
+    wait_decision = input('Would you like to wait for the extract to complete and download automatically when it is ready? [y/n]')
     if wait_decision.lower()[0] == 'y':
         print('Waiting for the extract to complete ...')
         ipums.wait_for_extract(extract)
@@ -106,7 +106,7 @@ def submit_extract():
 
             while True:
                 variable_error = False
-                variable_code_to_filter_by = input('Which variable to filter by? Please provide one variable code first:').upper()
+                variable_code_to_filter_by = input('Which variable to filter by? Please provide one variable code first: ').upper()
                 if variable_code_to_filter_by not in variables_available_in_samples:
                     print(f'The variable "{variable_code_to_filter_by}" is not available in the sample(s) you selected, please double check.')
                     variable_error = True
@@ -116,7 +116,7 @@ def submit_extract():
             variable_values_to_filter_with = input(f'''Which values of this variable to include? Please use the codes instead of textual label (e.g. for CITY variable, use 4610,4611 instead of
 New York,Brooklyn). Value codes should be comma separated, unless the values are a numeric range, in which case you should use "begin:end"
 format (e.g. for AGE variable, use 15:64 to include values between 15 and 64, both ends inclusive). You may look up value codes at
-https://usa.ipums.org/usa-action/variables/{variable_code_to_filter_by}#codes_section.''').replace(' ','')
+https://usa.ipums.org/usa-action/variables/{variable_code_to_filter_by}#codes_section.\n''').replace(' ','')
             if ':' in variable_values_to_filter_with:
                 range_start,range_start = variable_values_to_filter_with.split(':')
                 variable_values_to_filter_with = list(map(str, range(range_start,range_start+1)))
@@ -130,13 +130,13 @@ https://usa.ipums.org/usa-action/variables/{variable_code_to_filter_by}#codes_se
             end_filter_decision = input('Filter added successfully. Do you have more filters to add? [y/n]')
             if end_filter_decision.lower()[0]=='n':
                 break
+    print('Here is the summary of this extract:\n')
     print('------------------------------------------')
-    print('Here is the summary of this extract:')
-    print('Samples:',','.join(sample_id_list))
-    print('Variables:',','.join(variables_list))
-    print('Filters:', '\n         & '.join([pair[0]+':'+','.join(pair[1]) for pair in filter_info_pairs]) if len(filter_info_pairs)>0 else 'None')
-    print('Description:', extract_description)
-    print('------------------------------------------')
+    print('Samples:'+'\n\t'+','.join(sample_id_list))
+    print('Variables:'+'\n\t'+','.join(variables_list))
+    print('Filters:'+'\n\t'+'\n\t& '.join([pair[0]+':'+','.join(pair[1]) for pair in filter_info_pairs]) if len(filter_info_pairs)>0 else 'None')
+    print('Description:'+'\n\t'+extract_description)
+    print('------------------------------------------\n')
     while True:
         create_decision = input('Please type "yes" to confirm the information above or type "no" to do it again:')
         if create_decision.lower()[0]=='n':
@@ -156,10 +156,10 @@ https://usa.ipums.org/usa-action/variables/{variable_code_to_filter_by}#codes_se
                              variable_values_to_filter_with,
                              general=True) # only general codes supported for now since it would be enough foor most use cases
     
-    submit_decision = input('Extract information confirmed. Are you ready to submit this extract to IPUMS server? [y/n]')
+    submit_decision = input('\nExtract information confirmed. Are you ready to submit this extract to IPUMS server? [y/n]')
     if submit_decision.lower()[0] == 'y':
         extract_id = ipums.submit_extract(extract)
-        print(f"\nExtract submitted with id ***{extract.extract_id}***.\n\nPlease take note of this id if you plan to retrieve it later.")
+        print(f"\nExtract submitted with id *** {extract.extract_id} ***.\n\nPlease take note of this id if you plan to retrieve it later.")
         extract_status = ipums.extract_status(collection="usa", extract=extract_id)
         print(f'Your extract is {extract_status}.')
         if extract_status == 'failed':
