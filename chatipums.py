@@ -5,11 +5,12 @@ clear_output()
 
 from ipumspy import IpumsApiClient, UsaExtract, readers
 IPUMS_API_KEY = input("Your IPUMS API Key: (Acquire it at https://account.ipums.org/api_keys if you don't have one yet)")
+clear_output()
 ipums = IpumsApiClient(IPUMS_API_KEY)
 
 from pathlib import Path
 DOWNLOAD_DIR = Path(input('Please specify the folder in which you plan to save the downloaded extract (full path): ').strip())
-clear_output()
+
 
 import pandas as pd
 import numpy as np
@@ -30,7 +31,7 @@ sample_table['year'] = sample_table['Sample ID'].apply(lambda x: x[2:-1])
 sample_table['detail'] = sample_table.apply(lambda row: row['Description'].split(row['year'],maxsplit=1)[-1].strip().strip(',').strip(), axis=1)
 sample_table = sample_table.rename(columns={'Sample ID':'sample_id','Description':'description'})
 
-meta_df = pd.read_feather('/content/chatipums/ipums_usa_variable_metadata.feather')
+meta_df = pd.read_feather('/content/nl4ds/ipums_usa_variable_metadata.feather')
 preselected_fields = ['SAMPLE', 'SERIAL', 'HHWT', 'GQ', 'PERNUM', 'PERWT', 'VERSIONHIST', 'HISTID']
 
 def select_sample(df):
@@ -209,13 +210,13 @@ def load_extract():
 
     print('Processing ...')
 
-    df = pd.read_csv(f'/content/drive/MyDrive/epumspy/data/usa_{extract_id.zfill(5)}.csv.gz')
+    df = pd.read_csv(DOWNLOAD_DIR / f'usa_{extract_id.zfill(5)}.csv.gz')
     ddi = readers.read_ipums_ddi(DOWNLOAD_DIR / f'usa_{extract_id.zfill(5)}.xml')
     ddi_df = pd.DataFrame(ddi.data_description)[['id','label','description','notes','codes']]
 
     if drop_preselected_fields_decision.lower()[0] == 'y':
         df = df.drop([x for x in df.columns if x in preselected_fields], axis=1).reset_index(drop=True)
-        ddi_df = ddi_df.query('id not in @preselect_fields').reset_index(drop=True)
+        ddi_df = ddi_df.query('id not in @preselected_fields').reset_index(drop=True)
 
     ddi_df['largely_numeric'] = ddi_df['codes'].apply(lambda dic: np.mean([k==str(v) for k,v in dic.items()])>0.9)
     ddi_df['codes'] = ddi_df['codes'].apply(lambda x: {v:k for k,v in x.items()} if isinstance(x,dict) else np.nan)
