@@ -31,7 +31,7 @@ sample_table['year'] = sample_table['Sample ID'].apply(lambda x: x[2:-1])
 sample_table['detail'] = sample_table.apply(lambda row: row['Description'].split(row['year'],maxsplit=1)[-1].strip().strip(',').strip(), axis=1)
 sample_table = sample_table.rename(columns={'Sample ID':'sample_id','Description':'description'})
 
-meta_df = pd.read_feather('/content/nl4ds/ipums_usa_variable_metadata.feather')
+meta_df = pd.read_feather('/content/nl4ds/core_data/ipums_usa_variable_metadata.feather')
 preselected_fields = ['SAMPLE', 'SERIAL', 'HHWT', 'GQ', 'PERNUM', 'PERWT', 'VERSIONHIST', 'HISTID']
 
 def select_sample(df):
